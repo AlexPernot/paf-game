@@ -5,7 +5,7 @@ import {parseCsv, csvEscape} from "./csv.js";
 
 const apiKey = process.env.TMDB_API_KEY;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const CSV_FILE = path.join(__dirname, 'collected.csv');
+const CSV_FILE = path.join(__dirname, 'data', 'game.csv');
 
 // Real limit is around 40 req/s but let's be good citizens.
 const RATE_LIMIT_PER_SECOND = 30;

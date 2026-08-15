@@ -6,7 +6,7 @@ import {parseCsv, csvEscape} from "./csv.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, 'data');
 const TMDB_FILE = path.join(DATA_DIR, 'tmdb-movies.json');
-const CSV_FILE = path.join(__dirname, 'collected.csv');
+const CSV_FILE = path.join(__dirname, 'data', 'game.csv');
 
 console.log('Loading TMDB movies...');
 const tmdbContent = fs.readFileSync(TMDB_FILE, 'utf8');

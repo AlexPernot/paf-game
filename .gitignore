@@ -143,3 +143,8 @@ vite.config.ts.timestamp-*
 .vite/
 
 .idea
+# TMDB movie dump (too large for git, see README)
+data/tmdb-movies.json
+
+# Claude Code local config/worktrees
+.claude/

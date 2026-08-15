@@ -4,7 +4,7 @@ import {fileURLToPath} from "url";
 import {parseCsv, csvEscape} from "./csv.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const CSV_FILE = path.join(__dirname, 'collected.csv');
+const CSV_FILE = path.join(__dirname, 'data', 'game.csv');
 
 const csvContent = fs.readFileSync(CSV_FILE, 'utf8');
 const rows = parseCsv(csvContent);

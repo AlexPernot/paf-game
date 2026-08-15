@@ -8,7 +8,7 @@ const DATA_DIR = path.join(__dirname, 'data');
 const PLAYERS = fs.readdirSync(DATA_DIR, {withFileTypes: true})
     .filter(entry => entry.isDirectory())
     .map(entry => entry.name);
-const OUTPUT_FILE = path.join(__dirname, 'collected.csv');
+const OUTPUT_FILE = path.join(__dirname, 'data', 'game.csv');
 
 const allMovies = new Map(); // name -> { name, ratings: { paf, bryvan, beranger } }
 const ratingsByPlayer = {};
