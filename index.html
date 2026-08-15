@@ -4,49 +4,51 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Le jeu de la note</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
   <div id="app">
+    <header id="app-header">
+      <button type="button" class="btn-back" id="header-back">‹ Retour</button>
+      <h1 class="title title-small">LE JEU DE LA NOTE</h1>
+    </header>
+
     <section id="screen-title" class="screen" data-screen="title">
       <h1 class="title">LE JEU DE LA NOTE</h1>
       <div class="mode-buttons">
-        <button type="button" class="btn btn-mode" data-mode="notes">Films notés</button>
-        <button type="button" class="btn btn-mode" data-mode="vus">Films vus</button>
+        <button type="button" class="btn btn-mode" data-mode="notes">Uniquement les films notés</button>
+        <button type="button" class="btn btn-mode" data-mode="vus">Tous les films regardés</button>
       </div>
     </section>
 
     <section id="screen-picker" class="screen" data-screen="picker">
-      <button type="button" class="btn-back" id="picker-back">‹ Retour</button>
       <div class="card-grid" id="card-grid"></div>
       <div class="random-buttons">
-        <button type="button" class="btn btn-random" data-mode="notes">Aléatoire (notés)</button>
-        <button type="button" class="btn btn-random" data-mode="vus">Aléatoire (vus)</button>
+        <button type="button" class="btn btn-random" data-mode="notes">🎲 uniquement les films notés</button>
+        <button type="button" class="btn btn-random" data-mode="vus">🎲 tous les films regardés</button>
       </div>
     </section>
 
     <section id="screen-reveal" class="screen" data-screen="reveal">
-      <button type="button" class="btn-back" id="reveal-back">‹ Retour</button>
       <div class="reveal-layout">
         <div class="reveal-main">
           <h2 class="movie-title" id="movie-title"></h2>
           <div class="ratings-row" id="ratings-row"></div>
           <button type="button" class="btn-big-red" id="big-red-button"></button>
-          <button type="button" class="btn btn-reveal" id="reveal-button" hidden>Révéler les notes</button>
+          <div class="reveal-container" id="reveal-container">
+            <h2>Débattez !</h2>
+            <button type="button" class="btn btn-reveal" id="reveal-button">Révéler les notes</button>
+          </div>
         </div>
-        <aside class="lorem-ipsum">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-            commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-            velit esse cillum dolore eu fugiat nulla pariatur.
-          </p>
+        <aside class="movie-info">
+          <img class="movie-poster" id="movie-poster" alt="">
+          <p class="movie-overview" id="movie-overview"></p>
+          <p class="movie-meta" id="movie-meta"></p>
         </aside>
       </div>
     </section>
   </div>
 
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>

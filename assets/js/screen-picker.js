@@ -1,5 +1,7 @@
 import { state } from './state.js';
 
+const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+
 function isEligibleForNotes(movie, pseudonyms) {
     return pseudonyms.filter((p) => movie.ratings[p] != null).length >= 2;
 }
@@ -57,6 +59,9 @@ export function render() {
         card.type = 'button';
         card.className = 'card';
         card.textContent = movie.name;
+        if (movie.poster) {
+            card.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url("${IMAGE_BASE_URL}${movie.poster}")`;
+        }
         card.addEventListener('click', () => {
             state.selectedMovie = movie;
             onSelectMovie?.(movie);

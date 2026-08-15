@@ -1,3 +1,21 @@
+@font-face {
+    font-family: "SansSerifFLF";
+    src: url("../fonts/SansSerifFLF-bold.ttf.eot");
+    src: url("../fonts/SansSerifFLF-bold.ttf.eot?#iefix") format("embedded-opentype"),
+         url("../fonts/SansSerifFLF-bold.ttf.woff") format("woff");
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "SansSerifFLF";
+    src: url("../fonts/SansSerifFLF-demibold.ttf.eot");
+    src: url("../fonts/SansSerifFLF-demibold.ttf.eot?#iefix") format("embedded-opentype"),
+         url("../fonts/SansSerifFLF-demibold.ttf.woff") format("woff");
+    font-weight: 600;
+    font-style: normal;
+}
+
 :root {
     --red: #e53935;
     --red-dark: #8e0000;
@@ -10,6 +28,10 @@
     box-sizing: border-box;
 }
 
+button {
+    font-family: "SansSerifFLF", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
 html, body {
     height: 100%;
     margin: 0;
@@ -19,7 +41,7 @@ body {
     min-height: 100vh;
     background: radial-gradient(circle at center, hsl(140 70% 42%) 0%, hsl(140 45% 38%) 35%, hsl(140 20% 30%) 70%, hsl(140 8% 22%) 100%);
     color: var(--text);
-    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-family: "SansSerifFLF", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 #app {
@@ -28,16 +50,39 @@ body {
 }
 
 .screen {
-    display: none;
-    min-height: 100vh;
-    padding: 2rem;
-    position: relative;
-}
-
-.screen.is-active {
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.screen.is-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#app-header {
+    height: 4.5rem;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    pointer-events: none;
+}
+
+#app-header.is-visible {
+    display: flex;
+}
+
+#app-header .btn-back,
+#app-header .title-small {
+    pointer-events: auto;
 }
 
 /* Screen 1 - Title */
@@ -56,6 +101,11 @@ body {
     margin: 0;
 }
 
+.title-small {
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    z-index: 10;
+}
+
 .mode-buttons {
     display: flex;
     gap: 2rem;
@@ -64,8 +114,8 @@ body {
 }
 
 .btn {
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 600;
     padding: 1rem 2rem;
     border: none;
     border-radius: 0.75rem;
@@ -91,7 +141,7 @@ body {
     position: absolute;
     top: 1.25rem;
     left: 1.25rem;
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: 600;
     padding: 0.5rem 1.1rem;
     border: none;
@@ -126,15 +176,18 @@ body {
 
 .card {
     background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(255, 255, 255, 0);
     border-radius: 0.75rem;
     padding: 1.5rem 1rem;
     color: var(--text);
-    font-size: 1rem;
-    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    font-size: 1.5rem;
+    font-weight: 700;
     text-align: center;
     cursor: pointer;
-    min-height: 100px;
+    min-height: 300px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -142,7 +195,7 @@ body {
 }
 
 .card:hover, .card:focus-visible {
-    background: var(--card-bg-hover);
+    background-color: var(--card-bg-hover);
     transform: translateY(-3px);
 }
 
@@ -208,7 +261,16 @@ body {
 }
 
 .rating-card.is-stopped {
-    border-color: var(--red);
+    border-color: whitesmoke;
+}
+
+.rating-card.is-revealed {
+    border-color: gold;
+}
+
+.reveal-container {
+    text-align: center;
+    font-size: 2em;
 }
 
 .rating-label {
@@ -219,10 +281,44 @@ body {
     margin-bottom: 0.4rem;
 }
 
-.rating-value {
+.rating-reel {
+    --reel-item-height: 2.6rem;
+    height: var(--reel-item-height);
+    overflow: hidden;
+    position: relative;
+    background: rgba(0, 0, 0, 0.25);
+    box-shadow: inset 0 0.4rem 0.5rem -0.4rem rgba(0, 0, 0, 0.8),
+                inset 0 -0.4rem 0.5rem -0.4rem rgba(0, 0, 0, 0.8);
+    mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
+    /* Flip the window so the strip's upward scroll (driven by JS) reads as
+       a downward one; items are counter-flipped below to stay upright. */
+    transform: scaleY(-1);
+}
+
+.rating-card.is-stopped .rating-reel {
+    box-shadow: inset 0 0 0.5em 1px rgba(0, 0, 0, 0.5);
+    mask-image: none;
+}
+
+.rating-reel-strip {
+    display: flex;
+    flex-direction: column;
+    transform: translateY(0);
+}
+
+.rating-reel-item {
+    height: var(--reel-item-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 2rem;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
+    transform: scaleY(-1);
+}
+
+.rating-card:not(.is-stopped) .rating-reel-item {
+    filter: blur(1.5px);
 }
 
 .btn-big-red {
@@ -231,7 +327,8 @@ body {
     border-radius: 50%;
     border: none;
     background: radial-gradient(circle at 32% 28%, #ff6b5e, var(--red) 55%, var(--red-dark) 100%);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), inset 0 -6px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 0 rgb(183, 9, 0),
+    0 15px 20px rgba(0, 0, 0, .35);
     cursor: pointer;
     transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
@@ -242,20 +339,37 @@ body {
 
 .btn-big-red:active {
     transform: translateY(2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 -4px 8px rgba(0, 0, 0, 0.35);
 }
 
-.btn-reveal {
-    font-size: 1.1rem;
-}
-
-.lorem-ipsum {
+.movie-info {
+    font-family: Georgia, "Times New Roman", Times, serif;
+    color: #9ab;
+    font-size: 16px;
     flex: 1 1 250px;
     max-width: 320px;
-    font-size: 0.95rem;
     line-height: 1.6;
     opacity: 0.85;
-    background: rgba(255, 255, 255, 0.08);
+    background: #14181C;
     border-radius: 0.75rem;
     padding: 1.25rem;
+}
+
+.movie-poster {
+    display: block;
+    width: 100%;
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    margin-bottom: 1rem;
+}
+
+.movie-overview {
+    margin: 0;
+}
+
+.movie-meta {
+    margin: 0.75rem 0 0;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.75;
 }

@@ -49,18 +49,29 @@ export async function loadMovies(url = 'data/game.csv') {
     const rows = parseCsv(text);
 
     const header = rows[0];
-    const pseudonyms = header.slice(1, -1).map((h) => h.replace(/^rating-/, ''));
+    const popularityIdx = header.indexOf('popularity');
+    const posterIdx = header.indexOf('poster');
+    const overviewIdx = header.indexOf('overview');
+    const releaseDateIdx = header.indexOf('release_date');
+    const originalTitleIdx = header.indexOf('original_title');
+    const pseudonyms = header
+        .filter((h) => h.startsWith('rating-'))
+        .map((h) => h.replace(/^rating-/, ''));
 
     const movies = rows.slice(1).map((r) => {
         const ratings = {};
-        pseudonyms.forEach((p, i) => {
-            const raw = r[i + 1];
+        pseudonyms.forEach((p) => {
+            const raw = r[header.indexOf(`rating-${p}`)];
             ratings[p] = raw === '' || raw == null ? null : Number(raw);
         });
         return {
-            name: r[0],
+            name: r[header.indexOf('name')],
             ratings,
-            popularity: Number(r[r.length - 1]),
+            popularity: Number(r[popularityIdx]),
+            poster: r[posterIdx] || null,
+            overview: r[overviewIdx] || null,
+            releaseDate: r[releaseDateIdx] || null,
+            originalTitle: r[originalTitleIdx] || null,
         };
     });
 
