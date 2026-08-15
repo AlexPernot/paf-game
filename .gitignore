@@ -148,3 +148,8 @@ data/tmdb-movies.json
 
 # Claude Code local config/worktrees
 .claude/
+
+# Cloudflare Worker local secrets/deps
+worker/.dev.vars
+worker/node_modules/
+worker/.wrangler/

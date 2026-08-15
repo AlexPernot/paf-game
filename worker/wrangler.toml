@@ -1,0 +1,10 @@
+name = "paf-game-backend"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+[[r2_buckets]]
+binding = "GAME_BUCKET"
+bucket_name = "paf-game-data"
+
+[vars]
+ALLOWED_ORIGIN = "https://alexpernot.github.io"

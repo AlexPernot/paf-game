@@ -53,7 +53,7 @@ function startAll(pseudonyms) {
     itemHeight = document.querySelector('.rating-reel-item')?.getBoundingClientRect().height || 0;
 
     pseudonyms.forEach((p) => {
-        let idx = 0;
+        let idx = Math.floor(Math.random() * STEPS.length);
         timers[p] = setInterval(() => {
             updateDisplay(p, idx);
             idx += 1;

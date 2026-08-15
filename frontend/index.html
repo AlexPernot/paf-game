@@ -14,12 +14,26 @@
     </header>
 
     <section id="screen-title" class="screen" data-screen="title">
+      <button type="button" class="btn-upload" id="header-upload">Ajouter des joueurs</button>
       <h1 class="title">LE JEU DE LA NOTE</h1>
       <div class="mode-buttons">
         <button type="button" class="btn btn-mode" data-mode="notes">Uniquement les films notés</button>
         <button type="button" class="btn btn-mode" data-mode="vus">Tous les films regardés</button>
       </div>
     </section>
+
+    <dialog id="upload-dialog">
+      <form id="upload-form">
+        <h2>Ajouter des joueurs</h2>
+        <div id="upload-rows"></div>
+        <button type="button" class="btn" id="upload-add-row">+ Ajouter un joueur</button>
+        <p class="upload-status" id="upload-status"></p>
+        <div class="upload-actions">
+          <button type="button" class="btn" id="upload-cancel">Annuler</button>
+          <button type="submit" class="btn" id="upload-submit">Envoyer</button>
+        </div>
+      </form>
+    </dialog>
 
     <section id="screen-picker" class="screen" data-screen="picker">
       <div class="card-grid" id="card-grid"></div>
@@ -49,6 +63,7 @@
     </section>
   </div>
 
+  <script>window.BACKEND_URL = '{{env "BACKEND_URL"}}';</script>
   <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>

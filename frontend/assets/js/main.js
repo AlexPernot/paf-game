@@ -3,6 +3,7 @@ import { loadMovies } from './csv.js';
 import * as screenPicker from './screen-picker.js';
 import * as screenReveal from './screen-reveal.js';
 import { filterByMode, firstTen } from './screen-picker.js';
+import { initUpload } from './screen-upload.js';
 
 const SCREEN_TRANSITION_MS = 200;
 
@@ -23,11 +24,45 @@ function showScreen(name) {
     }
 }
 
-function goToPicker(mode) {
+function setPickerMessage(text) {
+    const grid = document.getElementById('card-grid');
+    grid.innerHTML = '';
+    const message = document.createElement('p');
+    message.className = 'empty-message';
+    message.textContent = text;
+    grid.appendChild(message);
+}
+
+let moviesPromise = null;
+
+async function ensureMoviesLoaded() {
+    if (!moviesPromise) {
+        moviesPromise = loadMovies();
+    }
+    try {
+        const { pseudonyms, movies } = await moviesPromise;
+        state.pseudonyms = pseudonyms;
+        state.allMovies = movies;
+    } catch (error) {
+        moviesPromise = null;
+        throw error;
+    }
+}
+
+async function goToPicker(mode) {
     state.mode = mode;
+    showScreen('picker');
+    setPickerMessage('Chargement des films...');
+
+    try {
+        await ensureMoviesLoaded();
+    } catch {
+        setPickerMessage('Impossible de charger les films. Réessayez plus tard.');
+        return;
+    }
+
     state.displayedMovies = firstTen(filterByMode(state.allMovies, mode, state.pseudonyms));
     screenPicker.render();
-    showScreen('picker');
 }
 
 function goToReveal(movie) {
@@ -36,11 +71,7 @@ function goToReveal(movie) {
     showScreen('reveal');
 }
 
-async function boot() {
-    const { pseudonyms, movies } = await loadMovies();
-    state.pseudonyms = pseudonyms;
-    state.allMovies = movies;
-
+function boot() {
     document.querySelectorAll('.btn-mode').forEach((btn) => {
         btn.addEventListener('click', () => goToPicker(btn.dataset.mode));
     });
@@ -51,6 +82,7 @@ async function boot() {
 
     screenPicker.initPicker({ onSelect: goToReveal });
     screenReveal.initReveal();
+    initUpload({ onUploaded: () => { moviesPromise = null; } });
 
     showScreen('title');
 }

@@ -1,3 +1,5 @@
+import { BACKEND_URL } from './config.js';
+
 export function parseCsv(content) {
     const rows = [];
     let row = [];
@@ -43,7 +45,7 @@ export function parseCsv(content) {
     return rows.filter((r) => r.length > 1 || r[0] !== '');
 }
 
-export async function loadMovies(url = 'data/game.csv') {
+export async function loadMovies(url = BACKEND_URL) {
     const res = await fetch(url);
     const text = await res.text();
     const rows = parseCsv(text);

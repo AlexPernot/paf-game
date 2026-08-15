@@ -1,0 +1,7 @@
+localhost:3000 {
+    templates
+
+    file_server {
+        root frontend
+    }
+}

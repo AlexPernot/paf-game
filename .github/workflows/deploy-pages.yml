@@ -27,13 +27,16 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Remove scripts and data folders
-        run: rm -rf scripts data/beranger data/bryvan data/paf
+      - name: Inject BACKEND_URL
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+        run: |
+          sed -i "s|{{env \"BACKEND_URL\"}}|${BACKEND_URL}|" frontend/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: frontend
 
       - name: Deploy to GitHub Pages
         id: deployment
