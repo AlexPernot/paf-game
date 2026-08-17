@@ -3,33 +3,47 @@ import { extractPlayerCsvs } from './zip.js';
 import { createTmdbClient } from './tmdb.js';
 import { buildGameRows, enrichRows, sortByPopularity } from './pipeline.js';
 
-function corsHeaders(env) {
+function allowedOrigins(env) {
+    return (env.ALLOWED_ORIGIN || '')
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean);
+}
+
+function corsHeaders(env, request) {
+    const origins = allowedOrigins(env);
+    const requestOrigin = request?.headers.get('Origin');
+    const allowOrigin = origins.length === 0
+        ? '*'
+        : (requestOrigin && origins.includes(requestOrigin) ? requestOrigin : origins[0]);
+
     return {
-        'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*',
+        'Access-Control-Allow-Origin': allowOrigin,
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
+        Vary: 'Origin',
     };
 }
 
-async function serveGameCsv(env) {
+async function serveGameCsv(env, request) {
     const object = await env.GAME_BUCKET.get('game.csv');
     if (!object) {
-        return jsonResponse({ error: 'game.csv not found' }, 404, env);
+        return jsonResponse({ error: 'game.csv not found' }, 404, env, request);
     }
 
     return new Response(object.body, {
         status: 200,
         headers: {
             'Content-Type': 'text/csv; charset=utf-8',
-            ...corsHeaders(env),
+            ...corsHeaders(env, request),
         },
     });
 }
 
-function jsonResponse(body, status, env) {
+function jsonResponse(body, status, env, request) {
     return new Response(JSON.stringify(body), {
         status,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders(env) },
+        headers: { 'Content-Type': 'application/json', ...corsHeaders(env, request) },
     });
 }
 
@@ -100,7 +114,7 @@ function toCsvText(header, rows) {
     return [header, ...rows].map((row) => row.map(csvEscape).join(',')).join('\n') + '\n';
 }
 
-function streamGameGeneration({ playerData, env, ctx, signal }) {
+function streamGameGeneration({ playerData, env, ctx, signal, request }) {
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
     const encoder = new TextEncoder();
@@ -168,7 +182,7 @@ function streamGameGeneration({ playerData, env, ctx, signal }) {
             'Content-Type': 'text/event-stream',
             'Cache-Control': 'no-cache',
             Connection: 'keep-alive',
-            ...corsHeaders(env),
+            ...corsHeaders(env, request),
         },
     });
 }
@@ -176,13 +190,13 @@ function streamGameGeneration({ playerData, env, ctx, signal }) {
 export default {
     async fetch(request, env, ctx) {
         if (request.method === 'OPTIONS') {
-            return new Response(null, { status: 204, headers: corsHeaders(env) });
+            return new Response(null, { status: 204, headers: corsHeaders(env, request) });
         }
         if (request.method === 'GET') {
-            return serveGameCsv(env);
+            return serveGameCsv(env, request);
         }
         if (request.method !== 'POST') {
-            return jsonResponse({ error: 'Method not allowed' }, 405, env);
+            return jsonResponse({ error: 'Method not allowed' }, 405, env, request);
         }
 
         try {
@@ -190,30 +204,30 @@ export default {
             try {
                 formData = await request.formData();
             } catch {
-                return jsonResponse({ error: 'Invalid form data' }, 400, env);
+                return jsonResponse({ error: 'Invalid form data' }, 400, env, request);
             }
 
             const { players, errors: validationErrors } = readPlayerSubmissions(formData);
             if (validationErrors.length > 0) {
-                return jsonResponse({ error: 'Validation failed', details: validationErrors }, 400, env);
+                return jsonResponse({ error: 'Validation failed', details: validationErrors }, 400, env, request);
             }
             if (players.length === 0) {
-                return jsonResponse({ error: 'No valid players submitted' }, 400, env);
+                return jsonResponse({ error: 'No valid players submitted' }, 400, env, request);
             }
 
             const { playerData, errors: archiveErrors } = await buildPlayerData(players);
             if (archiveErrors.length > 0) {
-                return jsonResponse({ error: 'Invalid archives', details: archiveErrors }, 400, env);
+                return jsonResponse({ error: 'Invalid archives', details: archiveErrors }, 400, env, request);
             }
 
             if (!env.TMDB_API_KEY) {
-                return jsonResponse({ error: 'Server misconfigured: missing TMDB_API_KEY' }, 500, env);
+                return jsonResponse({ error: 'Server misconfigured: missing TMDB_API_KEY' }, 500, env, request);
             }
 
-            return streamGameGeneration({ playerData, env, ctx, signal: request.signal });
+            return streamGameGeneration({ playerData, env, ctx, signal: request.signal, request });
         } catch (error) {
             console.log(error);
-            return jsonResponse({ error: 'Internal error' }, 500, env);
+            return jsonResponse({ error: 'Internal error' }, 500, env, request);
         }
     },
 };

@@ -7,4 +7,4 @@ binding = "GAME_BUCKET"
 bucket_name = "paf-game-data"
 
 [vars]
-ALLOWED_ORIGIN = "https://alexpernot.github.io"
+ALLOWED_ORIGIN = "https://alexpernot.github.io,https://alexpernot.com"
